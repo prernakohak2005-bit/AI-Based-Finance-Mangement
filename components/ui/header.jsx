@@ -1,25 +1,43 @@
 "use client";
 
 import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import Image from "next/image";
+import Link from "next/link";
 
 const Header = () => {
   return (
-    <header className="flex justify-end items-center p-4 gap-4 h-16">
+    <div className="flex justify-between items-center p-4 h-16">
       
-      {/* Always show Sign In */}
-      <SignInButton />
+      {/* Logo */}
+      <Link href="/">
+        <Image
+          src="/logo.png"
+          alt="welth logo"
+          width={200}
+          height={60}
+          className="h-12 w-auto object-contain"
+        />
+      </Link>
 
-      {/* Sign Up button */}
-      <SignUpButton>
-        <button className="bg-purple-700 text-white rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer">
-          Sign Up
-        </button>
-      </SignUpButton>
+      {/* Buttons */}
+      <div className="flex items-center gap-4">
+        
+        <SignInButton>
+          <button className="px-4 py-2 border rounded-md">
+            Sign In
+          </button>
+        </SignInButton>
 
-      {/* User profile button */}
-      <UserButton />
+        <SignUpButton>
+          <button className="bg-purple-700 text-white px-4 py-2 rounded-md">
+            Sign Up
+          </button>
+        </SignUpButton>
 
-    </header>
+        <UserButton />
+
+      </div>
+    </div>
   );
 };
 
