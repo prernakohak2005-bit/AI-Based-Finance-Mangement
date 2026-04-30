@@ -34,14 +34,12 @@ const Header = () => {
 
         {!isSignedIn ? (
           <>
-            {/* Sign In */}
             <SignInButton mode="modal">
               <button className="px-4 py-2 border rounded-md hover:bg-gray-100 transition">
                 Sign In
               </button>
             </SignInButton>
 
-            {/* Sign Up */}
             <SignUpButton mode="modal">
               <button className="bg-purple-700 text-white px-4 py-2 rounded-md hover:bg-purple-800 transition">
                 Sign Up
@@ -50,7 +48,6 @@ const Header = () => {
           </>
         ) : (
           <>
-            {/* Dashboard */}
             <Link
               href="/dashboard"
               className="flex items-center gap-2 border px-3 py-2 rounded-md text-gray-600 hover:text-blue-600 transition"
@@ -59,7 +56,6 @@ const Header = () => {
               <span className="hidden sm:block">Dashboard</span>
             </Link>
 
-            {/* Add Transaction (BLACK BUTTON) */}
             <Link
               href="/transaction/create"
               className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition"
@@ -68,7 +64,6 @@ const Header = () => {
               <span className="hidden sm:block">Add Transaction</span>
             </Link>
 
-            {/* User */}
             <UserButton
               appearance={{
                 elements: {
@@ -79,7 +74,6 @@ const Header = () => {
             />
           </>
         )}
-
       </div>
     </div>
   );
