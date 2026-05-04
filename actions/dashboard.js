@@ -4,42 +4,51 @@ import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-// FIXED serializer
+// serializer
 const serializeTransaction = (obj) => {
   if (!obj) return null;
 
   return {
     ...obj,
-    balance: obj.balance ? obj.balance.toNumber() : 0,
+    balance: obj.balance ? Number(obj.balance) : 0,
   };
 };
 
 export async function createAccount(data) {
   try {
-    const { userId } = auth();
+    // ✅ FIXED (await added)
+    const { userId } = await auth();
 
-    if (!userId) throw new Error("Unauthorized");
+    console.log("USER ID:", userId); // DEBUG
 
+    if (!userId) {
+      throw new Error("Unauthorized: No user session found");
+    }
+
+    // ✅ check user in DB
     const user = await db.user.findUnique({
       where: { clerkUserId: userId },
     });
 
     if (!user) {
-      throw new Error("User not found");
+      throw new Error("User not found in database");
     }
 
+    // ✅ validate balance
     const balanceFloat = parseFloat(data.balance);
 
     if (isNaN(balanceFloat)) {
       throw new Error("Invalid balance amount");
     }
 
+    // ✅ get existing accounts
     const existingAccounts = await db.account.findMany({
       where: { userId: user.id },
     });
 
+    // ✅ default logic
     const shouldBeDefault =
-      existingAccounts.length === 0 ? true : data.isDefault;
+      existingAccounts.length === 0 ? true : !!data.isDefault;
 
     if (shouldBeDefault) {
       await db.account.updateMany({
@@ -48,24 +57,26 @@ export async function createAccount(data) {
       });
     }
 
+    // ✅ create account
     const account = await db.account.create({
       data: {
-        ...data,
+        name: data.name,
+        type: data.type,
         balance: balanceFloat,
-        userId: user.id,
         isDefault: shouldBeDefault,
+        userId: user.id,
       },
     });
-
-    const serializedAccount = serializeTransaction(account);
 
     revalidatePath("/dashboard");
 
     return {
       success: true,
-      data: serializedAccount,
+      data: serializeTransaction(account),
     };
+
   } catch (error) {
+    console.error("CREATE ACCOUNT ERROR:", error);
     throw new Error(error?.message || "Something went wrong");
   }
 }

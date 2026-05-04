@@ -7,6 +7,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
+  DrawerDescription, // ✅ added
 } from "@/components/ui/drawer";
 
 import {
@@ -24,9 +25,14 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { accountSchema } from "@/app/lib/schema";
+import { createAccount } from "@/actions/dashboard";
+
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner"; // ✅ added
 
 const CreateAccountDrawer = ({ children }) => {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const {
     register,
@@ -45,24 +51,33 @@ const CreateAccountDrawer = ({ children }) => {
     },
   });
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
-    setOpen(false);
-    reset();
+  const onSubmit = async (data) => {
+    try {
+      setLoading(true);
+
+      await createAccount(data);
+
+      toast.success("Account created successfully ✅"); // ✅ added
+
+      setOpen(false);
+      reset();
+    } catch (err) {
+      console.error("CREATE ACCOUNT ERROR:", err);
+      toast.error(err.message || "Something went wrong ❌"); // ✅ added
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       
-      {/* Trigger */}
+      {/* ✅ SAFE TRIGGER */}
       <DrawerTrigger asChild>
         {children}
       </DrawerTrigger>
 
-      {/* Drawer Content */}
       <DrawerContent className="bg-white text-black">
-
-        {/* FULL WIDTH (dashboard style, left aligned) */}
         <div className="w-full px-6">
 
           {/* Header */}
@@ -70,6 +85,11 @@ const CreateAccountDrawer = ({ children }) => {
             <DrawerTitle className="text-xl font-semibold">
               Create New Account
             </DrawerTitle>
+
+            {/* ✅ Fix warning */}
+            <DrawerDescription>
+              Fill in the details to create your account
+            </DrawerDescription>
           </DrawerHeader>
 
           {/* Form */}
@@ -103,18 +123,26 @@ const CreateAccountDrawer = ({ children }) => {
               </label>
 
               <Select
-                onValueChange={(value) => setValue("type", value)}
+                onValueChange={(value) =>
+                  setValue("type", value, { shouldValidate: true })
+                }
                 defaultValue={watch("type")}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-white border">
                   <SelectValue placeholder="Select Type" />
                 </SelectTrigger>
 
-                <SelectContent>
+                <SelectContent className="bg-white border shadow-md z-50">
                   <SelectItem value="CURRENT">Current</SelectItem>
                   <SelectItem value="SAVINGS">Savings</SelectItem>
                 </SelectContent>
               </Select>
+
+              {errors.type && (
+                <p className="text-sm text-red-500">
+                  {errors.type.message}
+                </p>
+              )}
             </div>
 
             {/* Initial Balance */}
@@ -137,39 +165,52 @@ const CreateAccountDrawer = ({ children }) => {
               )}
             </div>
 
-            {/* Set Default */}
+            {/* Default Checkbox */}
             <div className="flex items-start gap-3">
               <Checkbox
-                checked={watch("isDefault")}
+                checked={!!watch("isDefault")}
                 onCheckedChange={(val) =>
-                  setValue("isDefault", val)
+                  setValue("isDefault", !!val, {
+                    shouldValidate: true,
+                  })
                 }
               />
+
               <div>
                 <p className="text-sm font-medium">
                   Set as Default
                 </p>
                 <p className="text-xs text-gray-500">
-                  This account will be selected by default for transactions
+                  This account will be selected by default
                 </p>
               </div>
             </div>
 
             {/* Buttons */}
-            <div className="border-t pt-4 flex justify-end gap-3">
-
+            <div className="border-t pt-4 flex gap-3">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setOpen(false)}
+                className="flex-1"
               >
                 Cancel
               </Button>
 
-              <Button type="submit">
-                Create Account
+              <Button
+                type="submit"
+                className="flex-1"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  "Create Account"
+                )}
               </Button>
-
             </div>
 
           </form>
