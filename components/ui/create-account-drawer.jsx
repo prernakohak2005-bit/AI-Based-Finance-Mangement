@@ -7,7 +7,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-  DrawerDescription, // ✅ added
+  DrawerDescription,
 } from "@/components/ui/drawer";
 
 import {
@@ -28,7 +28,7 @@ import { accountSchema } from "@/app/lib/schema";
 import { createAccount } from "@/actions/dashboard";
 
 import { Loader2 } from "lucide-react";
-import { toast } from "sonner"; // ✅ added
+import { toast } from "sonner";
 
 const CreateAccountDrawer = ({ children }) => {
   const [open, setOpen] = useState(false);
@@ -54,16 +54,15 @@ const CreateAccountDrawer = ({ children }) => {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-
       await createAccount(data);
 
-      toast.success("Account created successfully ✅"); // ✅ added
+      toast.success("Account created successfully ✅");
 
       setOpen(false);
       reset();
     } catch (err) {
-      console.error("CREATE ACCOUNT ERROR:", err);
-      toast.error(err.message || "Something went wrong ❌"); // ✅ added
+      console.error(err);
+      toast.error(err.message || "Something went wrong ❌");
     } finally {
       setLoading(false);
     }
@@ -72,143 +71,93 @@ const CreateAccountDrawer = ({ children }) => {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       
-      {/* ✅ SAFE TRIGGER */}
-      <DrawerTrigger asChild>
-        {children}
-      </DrawerTrigger>
+      {/* ✅ IMPORTANT: must pass BUTTON */}
+     <DrawerTrigger asChild>
+  <button className="border border-dashed rounded-lg px-8 py-5 cursor-pointer hover:shadow-sm transition w-full text-left">
+    <span className="text-sm text-gray-600">
+      + Add New Account
+    </span>
+  </button>
+</DrawerTrigger>
 
-      <DrawerContent className="bg-white text-black">
-        <div className="w-full px-6">
+      <DrawerContent>
+        <div className="w-full px-4">
 
-          {/* Header */}
-          <DrawerHeader className="px-0">
-            <DrawerTitle className="text-xl font-semibold">
-              Create New Account
-            </DrawerTitle>
-
-            {/* ✅ Fix warning */}
+          <DrawerHeader>
+            <DrawerTitle>Create New Account</DrawerTitle>
             <DrawerDescription>
               Fill in the details to create your account
             </DrawerDescription>
           </DrawerHeader>
 
-          {/* Form */}
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-6 pb-6"
-          >
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
-            {/* Account Name */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Account Name
-              </label>
-
-              <Input
-                placeholder="e.g. Main Checking"
-                {...register("name")}
-              />
-
+            {/* Name */}
+            <div>
+              <Input placeholder="Account Name" {...register("name")} />
               {errors.name && (
-                <p className="text-sm text-red-500">
+                <p className="text-red-500 text-sm">
                   {errors.name.message}
                 </p>
               )}
             </div>
 
-            {/* Account Type */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Account Type
-              </label>
+            {/* Type */}
+            <Select
+              onValueChange={(val) =>
+                setValue("type", val, { shouldValidate: true })
+              }
+              defaultValue={watch("type")}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="CURRENT">Current</SelectItem>
+                <SelectItem value="SAVINGS">Savings</SelectItem>
+              </SelectContent>
+            </Select>
 
-              <Select
-                onValueChange={(value) =>
-                  setValue("type", value, { shouldValidate: true })
-                }
-                defaultValue={watch("type")}
-              >
-                <SelectTrigger className="bg-white border">
-                  <SelectValue placeholder="Select Type" />
-                </SelectTrigger>
-
-                <SelectContent className="bg-white border shadow-md z-50">
-                  <SelectItem value="CURRENT">Current</SelectItem>
-                  <SelectItem value="SAVINGS">Savings</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {errors.type && (
-                <p className="text-sm text-red-500">
-                  {errors.type.message}
-                </p>
-              )}
-            </div>
-
-            {/* Initial Balance */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Initial Balance
-              </label>
-
+            {/* Balance */}
+            <div>
               <Input
                 type="number"
-                step="0.01"
-                placeholder="0.00"
+                placeholder="Balance"
                 {...register("balance")}
               />
-
               {errors.balance && (
-                <p className="text-sm text-red-500">
+                <p className="text-red-500 text-sm">
                   {errors.balance.message}
                 </p>
               )}
             </div>
 
-            {/* Default Checkbox */}
-            <div className="flex items-start gap-3">
+            {/* Default */}
+            <div className="flex items-center gap-2">
               <Checkbox
                 checked={!!watch("isDefault")}
                 onCheckedChange={(val) =>
-                  setValue("isDefault", !!val, {
-                    shouldValidate: true,
-                  })
+                  setValue("isDefault", !!val)
                 }
               />
-
-              <div>
-                <p className="text-sm font-medium">
-                  Set as Default
-                </p>
-                <p className="text-xs text-gray-500">
-                  This account will be selected by default
-                </p>
-              </div>
+              <p className="text-sm">Set as Default</p>
             </div>
 
             {/* Buttons */}
-            <div className="border-t pt-4 flex gap-3">
+            <div className="flex gap-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setOpen(false)}
-                className="flex-1"
               >
                 Cancel
               </Button>
 
-              <Button
-                type="submit"
-                className="flex-1"
-                disabled={loading}
-              >
+              <Button type="submit" disabled={loading}>
                 {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating...
-                  </>
+                  <Loader2 className="animate-spin h-4 w-4" />
                 ) : (
-                  "Create Account"
+                  "Create"
                 )}
               </Button>
             </div>
