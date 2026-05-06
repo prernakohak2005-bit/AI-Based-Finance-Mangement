@@ -20,14 +20,18 @@ const AccountCard = ({ account }) => {
 
   const { name, type, balance, isDefault, id } = account;
 
+  // 🔥 DEBUG (VERY IMPORTANT)
+  console.log("AccountCard ID:", id);
+
   const {
     loading: updateDefaultLoading,
     fn: updateDefaultFn,
     data: updatedAccount,
   } = useFetch(updateDefaultAccount);
 
-  // ✅ handle switch change
-  const handleDefaultChange = async () => {
+  const handleDefaultChange = async (e) => {
+    e.preventDefault(); // ✅ stop navigation
+
     if (isDefault) {
       toast.warning("You must have at least one default account");
       return;
@@ -36,7 +40,6 @@ const AccountCard = ({ account }) => {
     await updateDefaultFn(id);
   };
 
-  // ✅ correct useEffect (outside function)
   useEffect(() => {
     if (updatedAccount?.success) {
       toast.success("Default account updated successfully");
@@ -47,13 +50,12 @@ const AccountCard = ({ account }) => {
     <Link href={`/account/${id}`} className="block">
       <Card className="hover:shadow-md transition-shadow cursor-pointer group">
 
-        {/* HEADER */}
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="capitalize text-sm font-medium">
             {name}
           </CardTitle>
 
-          {/* prevent link navigation */}
+          {/* ✅ prevent navigation when clicking switch */}
           <div onClick={(e) => e.preventDefault()}>
             <Switch
               checked={isDefault}
@@ -63,18 +65,16 @@ const AccountCard = ({ account }) => {
           </div>
         </CardHeader>
 
-        {/* CONTENT */}
         <CardContent>
           <div className="text-2xl font-bold">
             ₹{Number(balance || 0).toFixed(2)}
           </div>
 
           <div className="text-sm text-muted-foreground capitalize">
-            {type.toLowerCase()} account
+            {type?.toLowerCase()} account
           </div>
         </CardContent>
 
-        {/* FOOTER */}
         <CardFooter className="flex justify-between text-sm">
           <div className="flex items-center text-green-600">
             <ArrowUpRight className="h-4 w-4 mr-1" />
