@@ -7,7 +7,6 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-  DrawerDescription,
 } from "@/components/ui/drawer";
 
 import {
@@ -19,7 +18,7 @@ import {
 } from "@/components/ui/select";
 
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 
 import { useForm } from "react-hook-form";
@@ -54,12 +53,13 @@ const CreateAccountDrawer = ({ children }) => {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
+
       await createAccount(data);
 
       toast.success("Account created successfully ✅");
 
-      setOpen(false);
       reset();
+      setOpen(false);
     } catch (err) {
       console.error(err);
       toast.error(err.message || "Something went wrong ❌");
@@ -71,30 +71,25 @@ const CreateAccountDrawer = ({ children }) => {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       
-      {/* ✅ IMPORTANT: must pass BUTTON */}
-     <DrawerTrigger asChild>
-  <button className="border border-dashed rounded-lg px-8 py-5 cursor-pointer hover:shadow-sm transition w-full text-left">
-    <span className="text-sm text-gray-600">
-      + Add New Account
-    </span>
-  </button>
-</DrawerTrigger>
+      <DrawerTrigger asChild>
+        {children}
+      </DrawerTrigger>
 
       <DrawerContent>
-        <div className="w-full px-4">
-
+        <div className="px-5 pb-7">
           <DrawerHeader>
             <DrawerTitle>Create New Account</DrawerTitle>
-            <DrawerDescription>
-              Fill in the details to create your account
-            </DrawerDescription>
           </DrawerHeader>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
             {/* Name */}
-            <div>
-              <Input placeholder="Account Name" {...register("name")} />
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Account Name</label>
+              <Input
+                placeholder="e.g Main Checking"
+                {...register("name")}
+              />
               {errors.name && (
                 <p className="text-red-500 text-sm">
                   {errors.name.message}
@@ -103,26 +98,32 @@ const CreateAccountDrawer = ({ children }) => {
             </div>
 
             {/* Type */}
-            <Select
-              onValueChange={(val) =>
-                setValue("type", val, { shouldValidate: true })
-              }
-              defaultValue={watch("type")}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="CURRENT">Current</SelectItem>
-                <SelectItem value="SAVINGS">Savings</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Account Type</label>
+
+              <Select
+                onValueChange={(val) =>
+                  setValue("type", val, { shouldValidate: true })
+                }
+                defaultValue={watch("type")}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="CURRENT">Current</SelectItem>
+                  <SelectItem value="SAVINGS">Savings</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
             {/* Balance */}
-            <div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Initial Balance</label>
               <Input
                 type="number"
-                placeholder="Balance"
+                step="0.01"
+                placeholder="0.00"
                 {...register("balance")}
               />
               {errors.balance && (
@@ -132,30 +133,41 @@ const CreateAccountDrawer = ({ children }) => {
               )}
             </div>
 
-            {/* Default */}
-            <div className="flex items-center gap-2">
-              <Checkbox
-                checked={!!watch("isDefault")}
-                onCheckedChange={(val) =>
-                  setValue("isDefault", !!val)
+            {/* ✅ FIXED SWITCH */}
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="text-sm font-medium">
+                  Set as Default
+                </label>
+                <p className="text-xs text-gray-500">
+                  This account will be used by default
+                </p>
+              </div>
+
+              <Switch
+                checked={watch("isDefault")}
+                onCheckedChange={(checked) =>
+                  setValue("isDefault", checked, {
+                    shouldValidate: true,
+                  })
                 }
               />
-              <p className="text-sm">Set as Default</p>
             </div>
 
             {/* Buttons */}
-            <div className="flex gap-2">
+            <div className="flex gap-2 pt-2">
               <Button
                 type="button"
+                className="flex-1"
                 variant="outline"
                 onClick={() => setOpen(false)}
               >
                 Cancel
               </Button>
 
-              <Button type="submit" disabled={loading}>
+              <Button type="submit" className="flex-1" disabled={loading}>
                 {loading ? (
-                  <Loader2 className="animate-spin h-4 w-4" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
                   "Create"
                 )}

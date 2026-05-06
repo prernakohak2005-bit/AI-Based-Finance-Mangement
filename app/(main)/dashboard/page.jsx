@@ -1,32 +1,43 @@
-
 import { getUserAccounts } from "@/actions/dashboard";
 import AccountCard from "./_components/accounts-card";
-
 import CreateAccountDrawer from "@/components/ui/create-account-drawer";
+
+import { Card } from "@/components/ui/card";
+import { Plus } from "lucide-react";
 
 export default async function DashboardPage() {
   const accounts = await getUserAccounts();
 
   return (
-    <div className="px-5">
-      <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+    <div className="px-5 space-y-6">
 
-      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+      {/* Title */}
+      <h1 className="text-3xl font-bold">Dashboard</h1>
 
-        {/* ✅ FIXED TRIGGER */}
+      {/* Grid */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+
+        {/* ✅ ADD ACCOUNT CARD (FIXED DRAWER TRIGGER) */}
         <CreateAccountDrawer>
-          <button className="border border-dashed rounded-lg px-8 py-5 cursor-pointer hover:shadow-sm transition w-full text-left">
-            <span className="text-sm text-gray-600">
-              + Add New Account
-            </span>
-          </button>
+          <Card className="cursor-pointer border-dashed hover:shadow-md transition-shadow flex items-center justify-center min-h-[160px]">
+            <div className="flex flex-col items-center justify-center text-muted-foreground">
+              <Plus className="h-8 w-8 mb-2" />
+              <p className="text-sm font-medium">Add New Account</p>
+            </div>
+          </Card>
         </CreateAccountDrawer>
 
-        {/* ✅ Accounts */}
-        {accounts?.length > 0 &&
+        {/* ACCOUNTS */}
+        {accounts?.length > 0 ? (
           accounts.map((account) => (
             <AccountCard key={account.id} account={account} />
-          ))}
+          ))
+        ) : (
+          <div className="text-muted-foreground col-span-full text-center py-10">
+            No accounts found
+          </div>
+        )}
+
       </div>
     </div>
   );
