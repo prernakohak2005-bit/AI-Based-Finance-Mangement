@@ -1,13 +1,23 @@
 "use client";
 import React from 'react'
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table'
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell
+} from '@/components/ui/table'
+
 import { Checkbox } from '@/components/ui/checkbox'
+import { format } from 'date-fns';
 
 const TransactionTable = ({ transactions }) => {
- const filteredAndSortedTransactions= transactions;
+
+  const filteredAndSortedTransactions = transactions;
 
   const handleSort = () => {
-    
+
   };
 
   return (
@@ -48,32 +58,62 @@ const TransactionTable = ({ transactions }) => {
             </TableHead>
 
             <TableHead>Recurring</TableHead>
+
             <TableHead className="w-[50px]" />
-          
-           
 
           </TableRow>
         </TableHeader>
 
         <TableBody>
-            {filteredAndSortedTransactions.length!==0?(
-                <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foregroud">
-                        No Transactions Found
-                    </TableCell>
-                </TableRow>
-            ):(
-            
-          <TableRow>
-            <TableCell className="font-medium">INV001</TableCell>
-            <TableCell>Paid</TableCell>
-            <TableCell>Credit Card</TableCell>
-            <TableCell className="text-right">$250.00</TableCell>
-          </TableRow>
-        )}
+
+          {filteredAndSortedTransactions.length === 0 ? (
+
+            <TableRow>
+              <TableCell
+                colSpan={7}
+                className="text-center text-muted-foreground"
+              >
+                No Transactions Found
+              </TableCell>
+            </TableRow>
+
+          ) : (
+
+            filteredAndSortedTransactions.map((transaction) => (
+
+              <TableRow key={transaction.id}>
+
+                <TableCell>
+                  <Checkbox />
+                </TableCell>
+
+                <TableCell>
+                  {format(new Date(transaction.date), "dd/MM/yyyy")}
+                </TableCell>
+
+                <TableCell>
+                  {transaction.description}
+                </TableCell>
+
+                <TableCell className="text-right">
+                  $250.00
+                </TableCell>
+
+                <TableCell>
+                  No
+                </TableCell>
+
+                <TableCell />
+              </TableRow>
+
+            ))
+
+          )}
+
         </TableBody>
 
       </Table>
+
     </div>
   )
 }
