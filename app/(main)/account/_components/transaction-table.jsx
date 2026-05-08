@@ -1,6 +1,8 @@
 "use client";
 
-import React from 'react'
+import React, { useState } from 'react';
+
+import { useRouter } from 'next/navigation';
 
 import {
   Table,
@@ -9,12 +11,16 @@ import {
   TableHead,
   TableBody,
   TableCell
-} from '@/components/ui/table'
+} from '@/components/ui/table';
 
-import { Checkbox } from '@/components/ui/checkbox'
+import { Checkbox } from '@/components/ui/checkbox';
+
 import { format } from 'date-fns';
+
 import { categoryColors } from '@/data/categories';
+
 import { Badge } from '@/components/ui/badge';
+
 
 import {
   Tooltip,
@@ -23,7 +29,20 @@ import {
   TooltipProvider
 } from '@/components/ui/tooltip';
 
-import { Clock } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+
+import { Button } from "@/components/ui/button";
+
+import { ChevronDown, ChevronUp, Clock, MoreHorizontal } from 'lucide-react';
+
 
 const RECURRING_INTERVELS = {
   DAILY: "Daily",
@@ -33,10 +52,24 @@ const RECURRING_INTERVELS = {
 };
 
 const TransactionTable = ({ transactions }) => {
+  const router=useRouter();
+  const [selectedIds,setSelectedIds]=useState([]);
+  const [sortConfig,setSortConfig]=useState({
+    field:"date",
+    direction:"desc",
+
+  });
 
   const filteredAndSortedTransactions = transactions;
 
-  const handleSort = () => {
+  const handleSort = (field) => {
+    setSortConfig(current=>({
+        field,
+        direction:
+        current.field == field && current.direction === "asc"?"desc":"asc"
+
+
+    }))
 
   };
 
@@ -59,7 +92,9 @@ const TransactionTable = ({ transactions }) => {
               onClick={() => handleSort("date")}
             >
               <div className='flex items-center'>
-                Date
+                Date{sortConfig.field === 'date' &&(
+                    sortConfig.direction =="asc"?<ChevronUp className='ml-1 h-4 w-4'/>:<ChevronDown className='ml-1 h-4 w-4' />
+                )}
               </div>
             </TableHead>
 
@@ -73,7 +108,11 @@ const TransactionTable = ({ transactions }) => {
             >
               <div className='flex items-center'>
                 Category
+                {sortConfig.field === 'category' &&(
+                    sortConfig.direction =="asc"?<ChevronUp className='ml-1 h-4 w-4'/>:<ChevronDown className='ml-1 h-4 w-4' />
+                )}
               </div>
+              
             </TableHead>
 
             <TableHead
@@ -82,7 +121,11 @@ const TransactionTable = ({ transactions }) => {
             >
               <div className='flex items-center justify-end'>
                 Amount
+                {sortConfig.field === 'amount' &&(
+                    sortConfig.direction =="asc"?<ChevronUp className='ml-1 h-4 w-4'/>:<ChevronDown className='ml-1 h-4 w-4' />
+                )}
               </div>
+
             </TableHead>
 
             <TableHead>
@@ -150,6 +193,7 @@ const TransactionTable = ({ transactions }) => {
                         : "green",
                   }}
                 >
+
                   {transaction.type === "EXPENSE" ? "-" : "+"}
 
                   Rs.{transaction.amount.toFixed(2)}
@@ -170,6 +214,7 @@ const TransactionTable = ({ transactions }) => {
                             variant="outline"
                             className="gap-1"
                           >
+
                             <Clock className='h-3 w-3' />
 
                             {
@@ -183,27 +228,89 @@ const TransactionTable = ({ transactions }) => {
                         </TooltipTrigger>
 
                         <TooltipContent>
-                          <p>Add to library</p>
+
+                          <div className='text-sm'>
+
+                            <div className='font-medium'>
+                              Next Date:
+                            </div>
+
+                            <div>
+                              {format(
+                                new Date(transaction.nextRecurringDate),
+                                "dd/MM/yyyy"
+                              )}
+                            </div>
+
+                          </div>
+
                         </TooltipContent>
 
                       </Tooltip>
 
                     </TooltipProvider>
 
-                  ) :<Badge
-                            variant="outline"
-                            className="gap-1"
-                          >
-                            <Clock className='h-3 w-3' />
+                  ) : (
 
-                            One-Time
+                    <Badge
+                      variant="outline"
+                      className="gap-1"
+                    >
 
-                          </Badge>
-}
+                      <Clock className='h-3 w-3' />
+
+                      One-Time
+
+                    </Badge>
+
+                  )}
 
                 </TableCell>
 
-                <TableCell />
+                <TableCell>
+
+                  <DropdownMenu>
+
+                    <DropdownMenuTrigger asChild>
+
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <MoreHorizontal className='h-4 w-4'/>
+                      </Button>
+
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent>
+
+                      <DropdownMenuGroup>
+
+                        <DropdownMenuLabel 
+                        onClick={() => router.push(
+                            '/transaction/credit?edit=${transaction.id}'
+                        )}>
+                          Edit
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator/>
+
+                        
+
+                      </DropdownMenuGroup>
+
+                      <DropdownMenuSeparator />
+
+                      <DropdownMenuGroup>
+
+                        <DropdownMenuItem className="text-destructive" onClick={()=>deleteFn([transaction.id])}>
+                          Delete
+                        </DropdownMenuItem>
+
+                       
+                      </DropdownMenuGroup>
+
+                    </DropdownMenuContent>
+
+                  </DropdownMenu>
+
+                </TableCell>
 
               </TableRow>
 
@@ -217,7 +324,7 @@ const TransactionTable = ({ transactions }) => {
 
     </div>
 
-  )
-}
+  );
+};
 
 export default TransactionTable;
