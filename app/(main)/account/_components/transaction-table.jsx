@@ -60,6 +60,25 @@ const TransactionTable = ({ transactions }) => {
 
   });
 
+  console.log(selectedIds);
+
+  const handleSelect=(id)=>{
+    setSelectedIds((current)=>
+      current.includes(id)
+      ?current.filter((item=>item!=id))
+      :[...current,id]
+    );
+
+  };
+  const handleSelectAll=()=>{
+    setSelectedIds((current)=>
+      current.length === filteredAndSortedTransactions.length
+      ?[]
+      :filteredAndSortedTransactions.map((t)=>t.id)
+    );
+
+  };
+
   const filteredAndSortedTransactions = transactions;
 
   const handleSort = (field) => {
@@ -84,7 +103,11 @@ const TransactionTable = ({ transactions }) => {
           <TableRow>
 
             <TableHead className="w-[50px]">
-              <Checkbox />
+              <Checkbox onCheckedChange={handleSelectAll}
+              checked={
+                selectedIds.length===filteredAndSortedTransactions.length&&
+                filteredAndSortedTransactions.length>0}
+                />
             </TableHead>
 
             <TableHead
@@ -160,7 +183,9 @@ const TransactionTable = ({ transactions }) => {
               <TableRow key={transaction.id}>
 
                 <TableCell>
-                  <Checkbox />
+                  <Checkbox onCheckedChange={() => handleSelect(transaction.id)}
+                    checked={selectedIds.includes(transaction.id)}
+                  />
                 </TableCell>
 
                 <TableCell>
