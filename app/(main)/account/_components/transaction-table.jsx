@@ -41,7 +41,9 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-import { ChevronDown, ChevronUp, Clock, MoreHorizontal } from 'lucide-react';
+import { ChevronDown, ChevronUp, Clock, MoreHorizontal, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select,SelectTrigger,SelectValue,SelectContent,SelectItem ,SelectGroup} from '@/components/ui/select';
 
 
 const RECURRING_INTERVELS = {
@@ -59,6 +61,10 @@ const TransactionTable = ({ transactions }) => {
     direction:"desc",
 
   });
+
+  const [searchTerm,setSearchTerm]=useState("");
+  const[typeFilter,setTypeFilter]=useState("");
+  const[recurringFilter,setRecurringFilter]=useState("");
 
   console.log(selectedIds);
 
@@ -95,6 +101,48 @@ const TransactionTable = ({ transactions }) => {
   return (
 
     <div className='space-y-4'>
+      {/*filters*/}
+      <div className="flex flex-col lg:flex-row gap-4 items-center">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground"/>
+          <Input
+           placeholder="Search transaction..."
+           value={searchTerm}
+           onChange={(e) => setSearchTerm(e.target.value)}
+           className="pl-8"/>
+
+        </div>
+        <div className='flex items-center gap-6 ml-4'>
+          <Select value={typeFilter} onValueChange={setTypeFilter}>
+  <SelectTrigger className="w-[140px]">
+    <SelectValue placeholder="All Types" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectGroup>
+        <SelectItem value="all">All Types</SelectItem>
+      
+      <SelectItem value="INCOME">Income</SelectItem>
+      <SelectItem value="EXPENSE">Expense</SelectItem>
+    </SelectGroup>
+  </SelectContent>
+</Select>
+
+     <Select value={recurringFilter} onValueChange={(value)=>setRecurringFilter(value)}>
+  <SelectTrigger className="w-[180px]">
+    <SelectValue placeholder="All Transaction"/>
+    
+  </SelectTrigger>
+  <SelectContent side="bottom" aling="start">
+    <SelectGroup>
+      <SelectItem value="all">All Transactions</SelectItem>
+      
+      <SelectItem value="recurring">Recurring Only</SelectItem>
+      <SelectItem value="non-recurring">Non-Recurring Only</SelectItem>
+    </SelectGroup>
+  </SelectContent>
+</Select>
+        </div>
+      </div>
 
       <Table>
 
