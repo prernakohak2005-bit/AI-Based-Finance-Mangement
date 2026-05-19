@@ -141,6 +141,10 @@ const TransactionTable = ({ transactions }) => {
     </SelectGroup>
   </SelectContent>
 </Select>
+{selectedIds.length>0 && <div>
+  <Button className="bg-red-500 hover:bg-red-600">
+    Delete Selected({selectedIds.length})
+    </Button></div>}
         </div>
       </div>
 
