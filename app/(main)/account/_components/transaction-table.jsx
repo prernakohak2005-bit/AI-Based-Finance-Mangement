@@ -44,6 +44,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp, Clock, MoreHorizontal, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select,SelectTrigger,SelectValue,SelectContent,SelectItem ,SelectGroup} from '@/components/ui/select';
+import { Trash } from 'lucide-react';
 
 
 const RECURRING_INTERVELS = {
@@ -98,6 +99,8 @@ const TransactionTable = ({ transactions }) => {
 
   };
 
+  const handleBulkDelete = () => {};
+
   return (
 
     <div className='space-y-4'>
@@ -141,8 +144,10 @@ const TransactionTable = ({ transactions }) => {
     </SelectGroup>
   </SelectContent>
 </Select>
-{selectedIds.length>0 && <div>
-  <Button className="bg-red-500 hover:bg-red-600">
+{selectedIds.length>0 && <div
+  className='flex items-center gap-2'>
+  <Button className="bg-red-500 hover:bg-red-600  onClick={handleBulkDelete}">
+    <Trash className="h-4 w-4 mr-2"/>
     Delete Selected({selectedIds.length})
     </Button></div>}
         </div>
