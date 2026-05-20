@@ -45,7 +45,7 @@ import { ChevronDown, ChevronUp, Clock, MoreHorizontal, Search } from 'lucide-re
 import { Input } from '@/components/ui/input';
 import { Select,SelectTrigger,SelectValue,SelectContent,SelectItem ,SelectGroup} from '@/components/ui/select';
 import { Trash } from 'lucide-react';
-
+import { X } from 'lucide-react';
 
 const RECURRING_INTERVELS = {
   DAILY: "Daily",
@@ -101,8 +101,13 @@ const TransactionTable = ({ transactions }) => {
 
   const handleBulkDelete = () => {};
 
-  return (
-
+  const handleClearFilters=()=>{
+    setSearchTerm("");
+    setTypeFilter(" ");
+    setRecurringFilter("");
+    setSelectedIds([]);
+  };
+return(
     <div className='space-y-4'>
       {/*filters*/}
       <div className="flex flex-col lg:flex-row gap-4 items-center">
@@ -150,6 +155,9 @@ const TransactionTable = ({ transactions }) => {
     <Trash className="h-4 w-4 mr-2"/>
     Delete Selected({selectedIds.length})
     </Button></div>}
+    {(searchTerm||typeFilter||recurringFilter)&&(
+      <Button variant="outline" size="icon" onClick={handleClearFilters} title="Clear Filters">< X className="h-4 w-5" /></Button>
+    )}
         </div>
       </div>
 
