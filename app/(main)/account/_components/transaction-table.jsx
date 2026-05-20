@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -86,7 +86,21 @@ const TransactionTable = ({ transactions }) => {
 
   };
 
-  const filteredAndSortedTransactions = transactions;
+  const filteredAndSortedTransactions = useMemo(()=>{
+    let result =[...transactions];
+
+    if(searchTerm){
+      const searchLower=searchTerm.toLowerCase();
+      result=result.filter((transaction)=>
+        transaction.description?.toLowerCase().includes(searchLower)
+    );
+    }
+    return result ;
+  },[transactions,searchTerm,
+    typeFilter,
+    recurringFilter,
+    sortConfig,
+  ]);
 
   const handleSort = (field) => {
     setSortConfig(current=>({
@@ -125,7 +139,7 @@ return(
   <SelectTrigger className="w-[140px]">
     <SelectValue placeholder="All Types" />
   </SelectTrigger>
-  <SelectContent>
+  <SelectContent side="bottom" aling="start">
     <SelectGroup>
         <SelectItem value="all">All Types</SelectItem>
       
