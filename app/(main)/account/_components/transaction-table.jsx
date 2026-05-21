@@ -102,6 +102,9 @@ const TransactionTable = ({ transactions }) => {
         return !transaction.isRecurring;
     });
     }
+    if(typeFilter){
+      result=result.filter((transaction)=> transaction.type === typeFilter);
+    }
     return result ;
   },[transactions,searchTerm,
     typeFilter,
