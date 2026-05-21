@@ -95,6 +95,13 @@ const TransactionTable = ({ transactions }) => {
         transaction.description?.toLowerCase().includes(searchLower)
     );
     }
+
+     if(recurringFilter){
+      result=result.filter((transaction)=>{
+        if(recurringFilter === "recurring") return transaction.isRecurring;
+        return !transaction.isRecurring;
+    });
+    }
     return result ;
   },[transactions,searchTerm,
     typeFilter,
