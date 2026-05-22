@@ -112,3 +112,44 @@ export async function getAccountWithTransactions(accountId) {
     return null;
   }
 }
+
+export async function bulkDeleteTransactions(transactionIds){
+  try{
+    const { userId } = await auth();
+
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      where: {
+        clerkUserId: userId,
+      },
+    });
+
+    if(!user){
+      throw new Error ("user not found ");
+    }
+
+    const transactions= await db.transaction.findMany({
+      where:{
+        id:{
+          in:transactionIds
+        },
+        userId:user.id,
+      },
+    });
+
+    const accountBalanceChanges=transactions.reduce((acc,transaction)=>{
+      const change=
+        transaction.type ==="EXPENSE"
+        ?transaction.amount
+        :-transaction.amount;
+
+      acc[transaction.accountId]=(acc[transaction.accountId] || 0)+change;
+      return acc;
+    },{});
+
+
+  } catch(error){
+
+  }
+}
