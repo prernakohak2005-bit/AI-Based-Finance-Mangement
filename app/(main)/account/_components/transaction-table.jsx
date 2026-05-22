@@ -105,6 +105,29 @@ const TransactionTable = ({ transactions }) => {
     if(typeFilter){
       result=result.filter((transaction)=> transaction.type === typeFilter);
     }
+
+    result.sort((a,b)=>{
+      let comparison=0
+        switch(sortConfig.field){
+          case"date":
+             comparison=new Date(a.date)-new Date(b.date);
+             break;
+          case"amount":
+             comparison=a.amount-b.amount;
+             break;    
+           case"category":
+             comparison=a.category.localCompare(b.category);
+             break;
+
+           default:
+           comparison=0;
+           break;
+
+          
+        }
+
+        return sortConfig.direction ==="asc"? comparison:-comparison;
+    });
     return result ;
   },[transactions,searchTerm,
     typeFilter,
