@@ -4,6 +4,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { toast } from 'sonner';
+
 import {
   Table,
   TableHeader,
@@ -48,6 +50,7 @@ import { Trash } from 'lucide-react';
 import { X } from 'lucide-react';
 import useFetch from '@/hooks/use-fetch';
 import { bulkDeleteTransactions } from '@/actions/accounts';
+import { BarLoader } from 'react-spinners';
 
 const RECURRING_INTERVELS = {
   DAILY: "Daily",
@@ -171,7 +174,7 @@ const TransactionTable = ({ transactions }) => {
 
   };
 
-  const handleBulkDelete = () => {};
+
 
   const handleClearFilters=()=>{
     setSearchTerm("");
@@ -181,6 +184,9 @@ const TransactionTable = ({ transactions }) => {
   };
 return(
     <div className='space-y-4'>
+      {deleteLoading && (
+      <BarLoader className='mt-4' width={"100%"} color="#9333ea"/>
+      )}
       {/*filters*/}
       <div className="flex flex-col lg:flex-row gap-4 items-center">
         <div className="relative flex-1 w-full">
