@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -84,7 +84,13 @@ const TransactionTable = ({ transactions }) => {
 
     }
     deleteFn(selectedIds);
-  }
+  };
+
+  useEffect(() => {
+    if (deleted && !deleteLoading){
+      toast.error("Transaction Deleted Sucessfully");
+    }
+  },[deleted, deleteLoading]);
 
   console.log(selectedIds);
 
