@@ -113,8 +113,8 @@ export async function getAccountWithTransactions(accountId) {
   }
 }
 
-export async function bulkDeleteTransactions(transactionIds){
-  try{
+export async function bulkDeleteTransactions(transactionIds) {
+  try {
     const { userId } = await auth();
 
     if (!userId) throw new Error("Unauthorized");
@@ -125,31 +125,69 @@ export async function bulkDeleteTransactions(transactionIds){
       },
     });
 
-    if(!user){
-      throw new Error ("user not found ");
+    if (!user) {
+      throw new Error("User not found");
     }
 
-    const transactions= await db.transaction.findMany({
-      where:{
-        id:{
-          in:transactionIds
+    const transactions = await db.transaction.findMany({
+      where: {
+        id: {
+          in: transactionIds,
         },
-        userId:user.id,
+        userId: user.id,
       },
     });
 
-    const accountBalanceChanges=transactions.reduce((acc,transaction)=>{
-      const change=
-        transaction.type ==="EXPENSE"
-        ?transaction.amount
-        :-transaction.amount;
+    const accountBalanceChanges = transactions.reduce(
+      (acc, transaction) => {
+        const change =
+          transaction.type === "EXPENSE"
+            ? transaction.amount
+            : -transaction.amount;
 
-      acc[transaction.accountId]=(acc[transaction.accountId] || 0)+change;
-      return acc;
-    },{});
+        acc[transaction.accountId] =
+          (acc[transaction.accountId] || 0) + change;
 
+        return acc;
+      },
+      {}
+    );
 
-  } catch(error){
+    await db.$transaction(async (tx) => {
 
+      // Delete transactions
+      await tx.transaction.deleteMany({
+        where: {
+          id: { in: transactionIds },
+          userId: user.id,
+        },
+      });
+
+      // Update account balances
+      for (const [accountId, balanceChange] of Object.entries(
+        accountBalanceChanges
+      )) {
+
+        await tx.account.update({
+          where: {
+            id: accountId,
+          },
+          data: {
+            balance: {
+              increment: balanceChange,
+            },
+          },
+        });
+
+      }
+    });
+
+    revalidatePath("/dashboard");
+    revalidatePath("/account/[id]");
+    return { success : true};
+
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: error.message };
   }
 }

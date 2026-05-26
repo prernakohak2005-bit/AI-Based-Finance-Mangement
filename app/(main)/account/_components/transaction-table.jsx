@@ -46,6 +46,8 @@ import { Input } from '@/components/ui/input';
 import { Select,SelectTrigger,SelectValue,SelectContent,SelectItem ,SelectGroup} from '@/components/ui/select';
 import { Trash } from 'lucide-react';
 import { X } from 'lucide-react';
+import useFetch from '@/hooks/use-fetch';
+import { bulkDeleteTransactions } from '@/actions/accounts';
 
 const RECURRING_INTERVELS = {
   DAILY: "Daily",
@@ -66,6 +68,23 @@ const TransactionTable = ({ transactions }) => {
   const [searchTerm,setSearchTerm]=useState("");
   const[typeFilter,setTypeFilter]=useState("");
   const[recurringFilter,setRecurringFilter]=useState("");
+
+  const {
+    loading:deleteLoading,
+    fn:deleteFn,
+    data:deleted,
+
+  }=useFetch(bulkDeleteTransactions);
+
+  const handleBulkDelete=async ()=>{
+    if(!window.confirm(
+     'Are You Sure You Want To delete ${selectedIds.length}transactions?'
+    )){
+      return;
+
+    }
+    deleteFn(selectedIds);
+  }
 
   console.log(selectedIds);
 
