@@ -81,7 +81,7 @@ const TransactionTable = ({ transactions }) => {
 
   const handleBulkDelete=async ()=>{
     if(!window.confirm(
-     'Are You Sure You Want To delete ${selectedIds.length}transactions?'
+     `Are You Sure You Want To delete ${selectedIds.length}transactions?`
     )){
       return;
 
@@ -229,7 +229,8 @@ return(
 </Select>
 {selectedIds.length>0 && <div
   className='flex items-center gap-2'>
-  <Button className="bg-red-500 hover:bg-red-600  onClick={handleBulkDelete}">
+  <Button className="bg-red-500 hover:bg-red-600"
+    onClick={handleBulkDelete}>
     <Trash className="h-4 w-4 mr-2"/>
     Delete Selected({selectedIds.length})
     </Button></div>}
