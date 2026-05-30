@@ -24,6 +24,7 @@ const DATE_RANGES={
 };
 
 const AccountChart = () => {
+    const [dateRange,setDateRange]=useState("1M");
   return (
     <div style={{ width: "100%", height: 400 }}>
       <ResponsiveContainer width="100%" height="100%">
