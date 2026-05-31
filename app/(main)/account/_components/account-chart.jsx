@@ -38,6 +38,11 @@ const AccountChart = ({transactions}) => {
             (t)=>new Date(t.date)>= startDate && new Date(t.date)<=endOfDay(now)
         );
 
+        const grouped = filtered.reduce((acc,transaction)=>{
+            const date=format(new Date (transaction.date),"MMM dd");
+
+        },{});
+
     },[transactions,dateRange])
   return (
     <div style={{ width: "100%", height: 400 }}>
