@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import { endOfDay, startOfDay, subDays } from "date-fns";
+import React, { useMemo } from "react";
 
 import {
   BarChart,
@@ -23,8 +24,21 @@ const DATE_RANGES={
     ALL:{label:"ALL TIME",days:null},
 };
 
-const AccountChart = () => {
+const AccountChart = ({transactions}) => {
     const [dateRange,setDateRange]=useState("1M");
+
+    const filteredData = useMemo(()=>{
+        const range=DATE_RANGES[dateRange];
+        const now=new Date();
+        const startDate=range.days
+        ? startOfDay(subDays(now,range.days))
+        : startOfDay(new Date(0));
+
+        const filtered=transactions.filter(
+            (t)=>new Date(t.date)>= startDate && new Date(t.date)<=endOfDay(now)
+        );
+
+    },[transactions,dateRange])
   return (
     <div style={{ width: "100%", height: 400 }}>
       <ResponsiveContainer width="100%" height="100%">
