@@ -41,6 +41,14 @@ const AccountChart = ({transactions}) => {
         const grouped = filtered.reduce((acc,transaction)=>{
             const date=format(new Date (transaction.date),"MMM dd");
 
+            if(!acc[data]){
+                acc[data]={date,income:0,expense:0};
+            }
+
+            if()
+
+        }
+
         },{});
 
     },[transactions,dateRange])
