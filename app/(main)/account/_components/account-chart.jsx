@@ -45,9 +45,15 @@ const AccountChart = ({transactions}) => {
                 acc[data]={date,income:0,expense:0};
             }
 
-            if()
+            if(transaction.type === "INCOME"){
+                acc[date].income+=transaction.amount;
 
-        }
+            }
+            else{
+                acc[date].expense+=transaction.amount;
+            }
+
+        
 
         },{});
 
