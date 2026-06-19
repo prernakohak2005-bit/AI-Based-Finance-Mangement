@@ -1,3 +1,4 @@
+import { endOfDay, format } from 'date-fns';
 import React from 'react';
 import {
   Bar,
@@ -25,8 +26,36 @@ export const AccountChart = ({transactions}) => {
   const filteredData= useMemo(()=>{
   const range=DATE_RANGES[dateRange];
   const now=new Date();
-  
+  const startDate=range.days
+  ? startofDay(subDays(now,range.days))
+  : startofDay(new Date(0));
+
+  const filtered=transactions.filter(
+    (t)=>new Date(t.date)>= startDate && new Date(t.date)<=endOfDay(now)
+  );
+
+  const grouped=filtered.reduce((acc,transactions)=>{
+    const date=format(new Date (transaction.date),"MMM dd");
+    if(!acc[date]){
+      acc[date]={date,income:0,expense:0};
+
+    }
+    if(transaction.type==="INCOME"){
+      acc[date].income += transaction.amount;
+    }else{
+      acc[date].expense += transaction.amount;
+
+    }
+    return acc;
+
+  },{});
+  return Object.values(grouped).sort(
+    (a,b) => new Date( a.date)- new Date(b.date)
+  );
+
   },[transactions,dateRange])
+
+  console.log(filteredData);
 
   return (
     <div>
