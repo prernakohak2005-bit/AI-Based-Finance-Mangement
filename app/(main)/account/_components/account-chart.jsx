@@ -162,13 +162,13 @@ const AccountChart = ({ transactions }) => {
 
             <Bar
               dataKey="income"
-              fill="#8884d8"
+              fill="#4ade80"
               radius={[10, 10, 0, 0]}
             />
 
             <Bar
               dataKey="expense"
-              fill="#82ca9d"
+              fill="#ef4444"
               radius={[10, 10, 0, 0]}
             />
           </BarChart>
